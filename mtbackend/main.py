@@ -1,0 +1,85 @@
+from fastapi import FastAPI, HTTPException, Depends, Request
+from pydantic import BaseModel
+from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy import Column, Integer, String, select
+from dotenv import load_dotenv
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+
+import os
+
+# Load .env
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Async engine and session
+engine = create_async_engine(DATABASE_URL, echo=True)
+AsyncSessionLocal = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+Base = declarative_base()
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# FastAPI app
+app = FastAPI()
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key= os.getenv("secrete_key")
+)
+
+# Models
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashedPassword = Column(String)
+
+# Async table creation function
+async def init_db():
+    async with engine.begin() as conn:
+        # This creates tables in the database
+        await conn.run_sync(Base.metadata.create_all)
+
+# Dependency for DB sessions
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+# Pydantic model for login
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # <--- frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],         # GET, POST, etc.
+    allow_headers=["*"],         # allow all headers
+)
+
+# Login endpoint
+@app.post("/login")
+async def login(data: LoginRequest, request:Request, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == data.email))
+    user = result.scalar_one_or_none()
+    if not user or not pwd_context.verify(data.password, user.hashedPassword):
+        raise HTTPException(status_code=400, detail="invalid email or password")
+    
+    request.session["user"] = user.id
+
+    return {"status":"ok", "message": "Login Go go gooo"}
+
+# Ensure tables are created on startup
+@app.on_event("startup")
+async def on_startup():
+    await init_db()
+    print("✅ Tables created (if not already present)")
+

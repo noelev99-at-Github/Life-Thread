@@ -10,27 +10,60 @@
   width: 100vw;
 
   /* Background image */
-  background-image: url('assets/logologinbackground.png'); /* <-- your image path */
-  background-size: cover;      /* cover entire container */
-  background-position: center; /* center image */
-  background-repeat: no-repeat;
-  background-attachment: fixed; 
+  background-color: black;
+  background-attachment: fixed;
 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   position: relative;
   overflow: hidden; /* hide overflow of drops/ripples */
 }
 
+/* Wave container */
+  .wave-container {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      transform: translateY(-50%);
+      z-index: 0;
+      overflow: hidden;
+  }
+
+  /* SVG Wave */
+  .wave-svg {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      animation: waveSlide 6s linear infinite;
+  }
+
+  @keyframes waveSlide {
+      from {
+          transform: translateX(-50%);
+      }
+      to {
+          transform: translateX(0);
+      }
+  }
+
+  .wave-path {
+      fill: none;
+      stroke: #ffd700;
+      stroke-width: 5;
+      filter: drop-shadow(0 0 5px gold) drop-shadow(0 0 10px #b8860b) drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+  }
+
 /* ===============================
    LOGIN CARD
    =============================== */
 .login-card {
-  background: rgba(255, 255, 255, 0.85); /* slightly transparent white */
-  padding: 35px 25px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 30px 20px;       /* more breathing room */
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  width: 90%;       
-  max-width: 350px; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12); /* slightly deeper shadow */
+  width: 90%;
+  max-width: 320px;         /* a bit wider for elegance */
   text-align: center;
   z-index: 1;
   position: relative;
@@ -41,17 +74,18 @@
   /* Animation */
   opacity: 0;
   animation: cardFadeIn 0.8s ease-out forwards;
-  backdrop-filter: blur(6px); /* optional: blur background for more depth */
+  backdrop-filter: blur(1px);
 }
 
 /* ===============================
    TITLE
    =============================== */
 .login-title {
-  margin-bottom: 30px;
-  font-size: 28px;
-  color: #333;
+  margin-bottom: 35px;      
+  font-size: 30px;
+
 }
+
 
 /* ===============================
    FORM
@@ -59,38 +93,30 @@
 .login-card form {
   display: flex;
   flex-direction: column;
-  gap: 12px; 
+  gap: 16px;                /* more vertical spacing between inputs */
   width: 100%;
-  max-width: 300px; 
+  max-width: 280px;         /* slightly wider inputs */
 }
 
 /* Animate inputs and button on page load */
 .login-card form > * {
-  opacity: 0; /* start hidden */
+  opacity: 0;
   animation: inputFadeIn 0.6s ease-out forwards;
 }
 
-.login-card form > *:nth-child(1) {
-  animation-delay: 0.4s;
-}
-
-.login-card form > *:nth-child(2) {
-  animation-delay: 0.6s;
-}
-
-.login-card form > *:nth-child(3) {
-  animation-delay: 0.8s;
-}
+.login-card form > *:nth-child(1) { animation-delay: 0.4s; }
+.login-card form > *:nth-child(2) { animation-delay: 0.6s; }
+.login-card form > *:nth-child(3) { animation-delay: 0.8s; }
 
 /* ===============================
    INPUTS
    =============================== */
 .login-input {
   width: 100%;
-  padding: 10px 12px; 
-  border-radius: 8px;
+  padding: 14px 16px;        /* more padding for elegance */
+  border-radius: 10px;       /* slightly rounder */
   border: 1px solid #ccc;
-  font-size: 15px;   
+  font-size: 16px;           /* slightly larger font */
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   box-sizing: border-box;
 }
@@ -98,51 +124,48 @@
 .login-input:focus {
   border-color: #83cb13;
   outline: none;
-  box-shadow: 0 0 8px rgba(131, 203, 19, 0.5);
-  transform: translateY(-2px); /* subtle lift on focus */
+  box-shadow: 0 0 10px rgba(131, 203, 19, 0.5);
+  transform: translateY(-2px);
 }
 
 .login-input::placeholder {
   color: #aaa;
+  font-size: 15px;          /* slightly smaller than input for subtlety */
 }
 
 /* ===============================
    BUTTON
    =============================== */
 .login-button {
-  width: 140px;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: #538641;
-  color: white;
+  width: 150px;              /* slightly wider */
+  padding: 10px;             /* more padding */
+  border-radius: 10px;       /* match inputs */
   font-size: 18px;
+  background: black;
+  color: white;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
   display: block;
   margin: 0 auto;
-
-  /* Lift effect on page load */
   transform: translateY(0);
 }
 
 .login-button:hover {
-  background: #83cb13;
-  transform: translateY(-2px); /* subtle lift */
+  background: #FFD700;
+  transform: translateY(-2px);
 }
 
 /* ===============================
    FOOTER
    =============================== */
 .login-footer {
-  margin-top: 20px;
+  margin-top: 25px;           /* more spacing */
   font-size: 14px;
   color: black;
   z-index: 1;
   position: relative;
   text-align: center;
 
-  /* Animate on page load */
   opacity: 0;
   animation: inputFadeIn 0.6s ease-out forwards;
   animation-delay: 1s;
