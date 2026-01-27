@@ -24,11 +24,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # FastAPI app
 app = FastAPI()
 
-app.add_middleware(
-    SessionMiddleware,
-    secret_key= os.getenv("secrete_key")
-)
-
 # Models
 class User(Base):
     __tablename__ = "users"
@@ -53,8 +48,8 @@ class LoginRequest(BaseModel):
     password: str
 
 origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(
@@ -63,6 +58,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],         # GET, POST, etc.
     allow_headers=["*"],         # allow all headers
+)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key= os.getenv("secrete_key")
 )
 
 # Login endpoint
@@ -75,7 +75,7 @@ async def login(data: LoginRequest, request:Request, db: AsyncSession = Depends(
     
     request.session["user"] = user.id
 
-    return {"status":"ok", "message": "Login Go go gooo"}
+    return {"status":"ok", "message": "Login Successful"}
 
 # Ensure tables are created on startup
 @app.on_event("startup")
