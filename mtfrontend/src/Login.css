@@ -206,25 +206,27 @@
     transform: translateY(0);
   }
 }
-
 .screen-wash {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0;
-  height: 0;
+  inset: 50%;
+  width: 100vmax;
+  height: 100vmax;
+  transform: translate(-50%, -50%) scale(0);
   border-radius: 50%;
   z-index: 9999;
   pointer-events: none;
-  animation: lightExplosion 2.5s ease-out forwards;
+
   background: radial-gradient(
     circle,
-    rgba(255, 248, 220, 1) 0%,
-    rgba(255, 215, 0, 1) 100%
+    rgba(255, 253, 245, 0.95) 0%,
+    rgba(255, 245, 220, 0.75) 35%,
+    rgba(255, 235, 180, 0.45) 65%,
+    rgba(255, 225, 150, 0.15) 100%
   );
-  box-shadow: 
-    0 0 100px 50px rgba(255, 215, 0, 0.6);
+
+  box-shadow: 0 0 120px 60px rgba(255, 240, 200, 0.35);
+
+  animation: lightExplosion 2.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .login-card.success-animation {
@@ -234,50 +236,49 @@
 
 @keyframes lightExplosion {
   0% {
-    width: 0;
-    height: 0;
+    transform: translate(-50%, -50%) scale(0);
     opacity: 0;
   }
-  
-  1% {
-    width: 10vw;
-    height: 10vw;
-    opacity: 1;
-  }
-  
+
   15% {
-    width: 50vw;
-    height: 50vw;
-    opacity: 1;
+    opacity: 0.6;
   }
-  
-  30% {
-    width: 100vw;
-    height: 100vw;
-    opacity: 1;
+
+  40% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.9;
   }
-  
-  50% {
-    width: 180vw;
-    height: 180vw;
-    opacity: 1;
-  }
-  
+
   70% {
-    width: 270vw;
-    height: 270vw;
+    transform: translate(-50%, -50%) scale(2.6);
     opacity: 1;
   }
-  
-  90% {
-    width: 360vw;
-    height: 360vw;
-    opacity: 1;
-  }
-  
+
   100% {
-    width: 400vw;
-    height: 400vw;
+    transform: translate(-50%, -50%) scale(4);
     opacity: 1;
   }
 }
+
+.screen-wash {
+  filter: blur(0px);
+}
+
+@keyframes lightExplosion {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    filter: blur(6px);
+  }
+
+  40% {
+    filter: blur(2px);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
