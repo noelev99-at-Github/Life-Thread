@@ -1,85 +1,40 @@
-from fastapi import FastAPI, HTTPException, Depends, Request
-from pydantic import BaseModel
-from passlib.context import CryptContext
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer, String, select
-from dotenv import load_dotenv
+from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from routes.login import router as login_router
+
+from models import init_db
 
 import os
 
-# Load .env
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-# Async engine and session
-engine = create_async_engine(DATABASE_URL, echo=True)
-AsyncSessionLocal = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
-Base = declarative_base()
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Runs before the app starts accepting requests
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    print("-----> Database initialized!")
+    yield  
 
 # FastAPI app
-app = FastAPI()
-
-# Models
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashedPassword = Column(String)
-
-# Async table creation function
-async def init_db():
-    async with engine.begin() as conn:
-        # This creates tables in the database
-        await conn.run_sync(Base.metadata.create_all)
-
-# Dependency for DB sessions
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
-
-# Pydantic model for login
-class LoginRequest(BaseModel):
-    email: str
-    password: str
+app = FastAPI(title="Life Thread API", lifespan=lifespan)
 
 origins = [
     "http://localhost:5174",
-    "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,       # <--- frontend URL
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],         # GET, POST, etc.
-    allow_headers=["*"],         # allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key= os.getenv("secrete_key")
+    secret_key=os.getenv("secrete_key")
 )
 
-# Login endpoint
-@app.post("/login")
-async def login(data: LoginRequest, request:Request, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == data.email))
-    user = result.scalar_one_or_none()
-    if not user or not pwd_context.verify(data.password, user.hashedPassword):
-        raise HTTPException(status_code=400, detail="invalid email or password")
-    
-    request.session["user"] = user.id
-
-    return {"status":"ok", "message": "Login Successful"}
-
-# Ensure tables are created on startup
-@app.on_event("startup")
-async def on_startup():
-    await init_db()
-    print("✅ Tables created (if not already present)")
+# Routes
+app.include_router(login_router)
 

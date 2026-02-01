@@ -81,7 +81,7 @@ function Dashboard() {
             <canvas ref={canvasRef} className="blog-sakura-canvas" />
             <div className="content">
                 <h1>Hello World</h1>
-                <p>Welcome to the dashboard, Genoo!</p>
+                <p>Welcome to the dashboard!</p>
             </div>
         </div>
     );
