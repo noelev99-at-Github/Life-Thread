@@ -1,13 +1,44 @@
-import React, { useEffect, useRef } from 'react'; // Added useEffect and useRef here
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
 import './Dashboard.css';
 
 function Dashboard() {
+    const navigate = useNavigate();
+    
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [isChecking, setIsChecking] = useState(true);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/me', { 
+                    withCredentials: true 
+                });
+                
+                if (response.status === 200) {
+                    setIsAuthorized(true);
+                }
+            } catch (err) {
+                console.log('Auth check failed:', err.response?.data || err.message);
+                setIsAuthorized(false);
+                navigate('/'); 
+            } finally {
+                setIsChecking(false);
+            }
+        };
+
+        checkAuth();
+    }, [navigate]);
+
+    // Sakura animation ----------------------------------------------------------------------------
     const canvasRef = useRef(null);
 
     useEffect(() => {
+        if (!isAuthorized) return;
+        
         const canvas = canvasRef.current;
         if (!canvas) return;
-
         const ctx = canvas.getContext('2d');
         let animationFrameId;
         let petals = [];
@@ -20,7 +51,6 @@ function Dashboard() {
         class Petal {
             constructor() {
                 this.reset();
-                // Randomize initial Y so they don't all start at the top at once
                 this.y = Math.random() * window.innerHeight;
             }
             reset() {
@@ -34,7 +64,6 @@ function Dashboard() {
             }
             update() {
                 this.y += this.speedY;
-                // Added the sine wave movement you had for a nice "drift" effect
                 this.x += this.speedX + Math.sin(this.y / 60) * 0.5;
                 this.angle += this.spin;
                 if (this.y > window.innerHeight) this.reset();
@@ -44,7 +73,6 @@ function Dashboard() {
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
                 ctx.beginPath();
-                // Drawing the petal shape
                 ctx.ellipse(0, 0, this.size, this.size / 1.5, 0, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(255, 183, 197, 0.6)';
                 ctx.fill();
@@ -74,7 +102,11 @@ function Dashboard() {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animationFrameId);
         };
-    }, []);
+    }, [isAuthorized]);
+
+    if (isChecking || !isAuthorized) {
+        return null; 
+    }
 
     return (
         <div className="dashboard-wrapper">

@@ -3,6 +3,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from routes.login import router as login_router
+from routes.authentication import router as authenticate
 
 from models import init_db
 
@@ -19,7 +20,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Life Thread API", lifespan=lifespan)
 
 origins = [
-    "http://localhost:5174",
+    "http://localhost:5174"
 ]
 
 app.add_middleware(
@@ -32,9 +33,12 @@ app.add_middleware(
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.getenv("secrete_key")
+    secret_key=os.getenv("secret_key"),
+    same_site="lax",
+    https_only=False
 )
 
 # Routes
 app.include_router(login_router)
+app.include_router(authenticate)
 

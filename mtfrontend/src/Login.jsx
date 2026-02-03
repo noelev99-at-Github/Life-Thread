@@ -10,32 +10,32 @@ function Login() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/login",
-        { email, password },
-        { withCredentials: true }
-      );
+      e.preventDefault();
+      try {
+        // 1. Post to login
+        const loginRes = await axios.post("http://localhost:8000/login", 
+          { email, password }, 
+          { withCredentials: true }
+        );
 
-      if (response.data.status === "ok") {
-        // 1. Trigger the "Ball of Light"
-        setIsSuccess(true);
-
-        // 2. Wait for the animation to finish (800ms) before changing pages
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2500);
+        if (loginRes.data.status === "ok") {
+          try {
+            await axios.get("http://localhost:8000/me", { withCredentials: true });
+            setIsSuccess(true);
+            setTimeout(() => navigate("/dashboard"), 2500);
+          } catch (checkErr) {
+            console.log(checkErr)
+            alert("Login succeeded, but session could not be established. Check CORS settings.");
+          }
+        }
+      } catch (err) {
+        alert("Invalid email or password");
+        console.error("Login failed", err);
       }
-    } catch (err) {
-      console.error("Login Error: ", err.response?.data || err.message);
-    }
-  };
+    };
 
   return (
     <div className="login-page">
-      {/* This is the light that will "eat the screen" */}
       {isSuccess && <div className="screen-wash"></div>}
 
       <div className="wave-container">
