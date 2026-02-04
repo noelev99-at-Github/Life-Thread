@@ -2,8 +2,11 @@ from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+
 from routes.login import router as login_router
 from routes.authentication import router as authenticate
+from routes.journalentryroute import router as journal_entry
+from routes.lifelessons import router as life_lesson
 
 from models import init_db
 
@@ -41,4 +44,6 @@ app.add_middleware(
 # Routes
 app.include_router(login_router)
 app.include_router(authenticate)
+app.include_router(life_lesson)
+app.include_router(journal_entry)
 

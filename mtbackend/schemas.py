@@ -1,14 +1,20 @@
 from pydantic import BaseModel
+from datetime import date
 
 # Pydantic model for login
 class LoginRequest(BaseModel):
     email: str
     password: str
 
-#Authentication Badge
+# Authentication 
 class UserResponse(BaseModel):
     status: str
-    user_id: int # or str, depending on your database ID type
+    user_id: int
 
-    class Config:
-        from_attributes = True
+class LifeLessonEntry(BaseModel):
+    ll_entry: str
+
+class JournalEntry(BaseModel):
+    date: date
+    title: str
+    entry: str
