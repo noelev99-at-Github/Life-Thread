@@ -11,16 +11,17 @@ function Login() {
 
   const handleSubmit = async (e) => {
       e.preventDefault();
+      // Send credentials to backend for verification and for session making
       try {
-        // 1. Post to login
         const loginRes = await axios.post("http://localhost:8000/login", 
           { email, password }, 
           { withCredentials: true }
         );
 
         if (loginRes.data.status === "ok") {
+          // Doublec checks if the cookie session is recognized by the backend
           try {
-            await axios.get("http://localhost:8000/me", { withCredentials: true });
+            await axios.get("http://localhost:8000/authenticate", { withCredentials: true });
             setIsSuccess(true);
             setTimeout(() => navigate("/dashboard"), 2500);
           } catch (checkErr) {

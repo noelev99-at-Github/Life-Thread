@@ -46,3 +46,51 @@ html, body {
     height: 100%;
     font-family: sans-serif;
 }
+.folder-container {
+    position: fixed;
+    bottom: 30px; /* Slightly higher to give the tabs room */
+    left: 20px;
+    display: flex;
+    gap: 25px; /* Space between folders */
+    align-items: flex-end;
+    z-index: 1000;
+}
+
+.lifelessonbutton {
+    width: 110px;
+    height: 75px;
+    position: relative; /* CRITICAL: This keeps the tab attached */
+    background: linear-gradient(145deg, #4a90e2, #7fb3ff);
+    border: 2px solid #3b78d8;
+    border-radius: 0 8px 8px 8px; /* Square top-left for the tab */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+}
+
+/* The Folder Tab */
+.lifelessonbutton::before {
+    content: "";
+    position: absolute;
+    top: -14px; /* Sits exactly on top */
+    left: -2px; /* Aligns with the left border */
+    width: 45px;
+    height: 14px;
+    background: #4a90e2; /* Matches the top color of the gradient */
+    border: 2px solid #3b78d8;
+    border-bottom: none; /* Merges it into the body */
+    border-radius: 6px 6px 0 0;
+}
+
+/* Hover Animation */
+.lifelessonbutton:hover {
+    transform: translateY(-8px);
+    background: linear-gradient(145deg, #5ba0f2, #8fc1ff);
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.4);
+}

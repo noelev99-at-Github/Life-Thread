@@ -1,18 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
+
+import LifeLesson from './LifeLesson.jsx';
+import Journal from './Journal.jsx';
+import Aspirations from './Aspirations.jsx';
+
 import './Dashboard.css';
 
+
 function Dashboard() {
+
+    // Code that checks if the user is logged in before allowing access
     const navigate = useNavigate();
-    
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/me', { 
+                const response = await axios.get('http://localhost:8000/authenticate', { 
                     withCredentials: true 
                 });
                 
@@ -30,6 +37,24 @@ function Dashboard() {
 
         checkAuth();
     }, [navigate]);
+
+    const [lifeLessonIsOpen, setLifeLessonIsOpen] = useState(false);
+
+    const lifeLesson = () => {
+        setLifeLessonIsOpen(!lifeLessonIsOpen);
+    }
+
+    const [journalIsOpen, setJournalIsOpen] = useState(false);
+
+    const journal = () => {
+        setJournalIsOpen(!journalIsOpen);
+    }
+
+    const [aspirationIsOpen, setAspirationIsOpen] = useState(false);
+
+    const aspiration = () => {
+        setAspirationIsOpen(!aspirationIsOpen)
+    }
 
     // Sakura animation ----------------------------------------------------------------------------
     const canvasRef = useRef(null);
@@ -114,6 +139,24 @@ function Dashboard() {
             <div className="content">
                 <h1>Hello World</h1>
                 <p>Welcome to the dashboard!</p>
+                
+                <div className="folder-container">
+                    <div className="folder-wrapper">
+                        <button onClick={lifeLesson} className='lifelessonbutton'>Life Lesson</button>
+                        {lifeLessonIsOpen && <LifeLesson isOpen={lifeLessonIsOpen} onClose={lifeLesson} />}
+                    </div>
+
+                    <div className="folder-wrapper">
+                        <button onClick={journal} className='lifelessonbutton'>Journal</button>
+                        {journalIsOpen && <Journal isOpen={journalIsOpen} onClose={journal} />}
+                    </div>
+
+                    <div className="folder-wrapper">
+                        <button onClick={aspiration} className='lifelessonbutton'>Aspiration</button>
+                        {aspirationIsOpen && <Aspirations isOpen={aspirationIsOpen} onClose={aspiration} />}
+                    </div>
+                </div>
+                
             </div>
         </div>
     );
